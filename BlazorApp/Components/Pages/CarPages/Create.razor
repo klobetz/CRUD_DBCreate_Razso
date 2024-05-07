@@ -1,0 +1,58 @@
+﻿@page "/cars/create"
+@inject BlazorApp.Data.MyDBContext DB
+@using BlazorApp.Model
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Car</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Car" OnValidSubmit="AddCar" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="model" class="form-label">Model:</label> 
+                <InputText id="model" @bind-Value="Car.Model" class="form-control" /> 
+                <ValidationMessage For="() => Car.Model" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="type" class="form-label">Type:</label> 
+                <InputText id="type" @bind-Value="Car.Type" class="form-control" /> 
+                <ValidationMessage For="() => Car.Type" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="colos" class="form-label">Colos:</label> 
+                <InputText id="colos" @bind-Value="Car.Colos" class="form-control" /> 
+                <ValidationMessage For="() => Car.Colos" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="performance" class="form-label">Performance:</label> 
+                <InputNumber id="performance" @bind-Value="Car.Performance" class="form-control" /> 
+                <ValidationMessage For="() => Car.Performance" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/cars">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Car Car { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddCar()
+    {
+        DB.Car.Add(Car);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/cars");
+    }
+}

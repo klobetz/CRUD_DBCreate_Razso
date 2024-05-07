@@ -1,0 +1,25 @@
+﻿@page "/cars"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject BlazorApp.Data.MyDBContext DB
+@using BlazorApp.Model
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="cars/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.Car">
+    <PropertyColumn Property="car => car.Model"  />
+    <PropertyColumn Property="car => car.Type" />
+    <PropertyColumn Property="car => car.Colos" />
+    <PropertyColumn Property="car => car.Performance" />
+
+    <TemplateColumn Context="car">
+        <a href="@($"cars/edit?carid={car.CarId}")">Edit</a> |
+        <a href="@($"cars/details?carid={car.CarId}")">Details</a> |
+        <a href="@($"cars/delete?carid={car.CarId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

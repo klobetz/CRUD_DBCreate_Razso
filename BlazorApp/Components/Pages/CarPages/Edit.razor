@@ -1,0 +1,101 @@
+﻿@page "/Cars/edit"
+@inject BlazorApp.Data.MyDBContext DB
+@using BlazorApp.Model
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Car</h4>
+<hr />
+@if (Car is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Car" OnValidSubmit="UpdateCar" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Car.CarId" value="@Car.CarId" />
+                <div class="mb-3">
+                    <label for="model" class="form-label">Model:</label>
+                    <InputText id="model" @bind-Value="Car.Model" class="form-control" />
+                    <ValidationMessage For="() => Car.Model" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="type" class="form-label">Type:</label>
+                    <InputText id="type" @bind-Value="Car.Type" class="form-control" />
+                    <ValidationMessage For="() => Car.Type" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="colos" class="form-label">Colos:</label>
+                    <InputText id="colos" @bind-Value="Car.Colos" class="form-control" />
+                    <ValidationMessage For="() => Car.Colos" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="performance" class="form-label">Performance:</label>
+                    <InputNumber id="performance" @bind-Value="Car.Performance" class="form-control" />
+                    <ValidationMessage For="() => Car.Performance" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/cars">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int CarId { get; set; }
+
+    [SupplyParameterFromForm]
+    public Car? Car { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Car ??= await DB.Car.FirstOrDefaultAsync(m => m.CarId == CarId);
+
+        if (Car is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateCar()
+    {
+        DB.Attach(Car!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!CarExists(Car!.CarId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/cars");
+    }
+
+    bool CarExists(int carid)
+    {
+        return DB.Car.Any(e => e.CarId == carid);
+    }
+}
